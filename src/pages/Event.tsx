@@ -5,7 +5,7 @@ import { UserChipElement, UserImageElement } from "../components/UserImage"
 import { useNavigate } from "react-router-dom"
 import { GlobalContext } from "../store"
 import CloseIcon from "@mui/icons-material/Close"
-import { Typography, Avatar, Divider } from "@mui/material"
+import { Typography, Avatar, Divider, Button, TextField } from "@mui/material"
 import Timeline from "@mui/lab/Timeline"
 import TimelineItem from "@mui/lab/TimelineItem"
 import TimelineSeparator from "@mui/lab/TimelineSeparator"
@@ -81,7 +81,7 @@ const Event = () => {
     const comments = reactionsRequest.data?.filter(
         (reaction) => reaction.type === "COMMENT"
     )
-    const reactionElements = comments?.map((reaction, index) => (
+    const reactionElements = comments?.reverse()?.map((reaction, index) => (
         <TimelineItem key={`[reaction][${index}]`}>
             <TimelineSeparator>
                 <UserImageElement username={reaction.user.username} />
@@ -190,13 +190,21 @@ const Event = () => {
                     <Box sx={{ display: "flex", gap: "10px" }}>
                         {availibilitieElements}
                     </Box>
+                    <Box>
+                        <Button>Share date</Button>
+                    </Box>
                 </Box>
 
                 <Divider sx={{ marginBottom: "10px" }}></Divider>
 
-                <Box sx={{ marginBottom: "50px" }}>
+                <Box sx={{ marginBottom: "20px" }}>
                     <Typography variant="subtitle1">Comments</Typography>
-                    {reactionElements.length === 0 ?? (
+                    <TextField placeholder="Type a message"></TextField>
+                    <Button>Send</Button>
+                </Box>
+
+                <Box sx={{ marginBottom: "50px" }}>
+                    {reactionElements?.length === 0 ?? (
                         <Typography variant="caption">
                             No reactions yet.
                         </Typography>

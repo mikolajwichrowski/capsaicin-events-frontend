@@ -2,16 +2,27 @@ import React, { useContext } from "react"
 import { useQuery } from "react-query"
 import Cookies from "js-cookie"
 import { useNavigate } from "react-router-dom"
-import { Box, List, LinearProgress } from "@mui/material"
+import { Box, List, LinearProgress, Typography } from "@mui/material"
 import { GlobalContext } from "../store"
-import { EventItem } from "../components/EventItem"
+import { EventItem, BlancItem } from "../components/EventItem"
 import NavBar from "../components/NavBar"
+import AddIcon from "@mui/icons-material/Add"
 
 const Home = () => {
     const navigate = useNavigate()
     const globalContext = useContext(GlobalContext)
-    const { isLoading, data } = useQuery("events", () =>
-        fetch("/api/event").then((res) => res.json())
+    const { isLoading, data } = useQuery(
+        "events",
+        () => fetch("/api/event").then((res) => res.json()),
+        {
+            cacheTime: 0,
+            useErrorBoundary: true,
+            retry: false,
+            onError: () => {
+                Cookies.set("logged_in", "no")
+                navigate("/login")
+            },
+        }
     )
 
     const logOut = () => {
@@ -32,7 +43,20 @@ const Home = () => {
         <>
             <NavBar onLogout={logOut} />
             <Box sx={{ height: "calc(100% - 60px)", marginTop: "60px" }}>
-                {isLoading ? <LinearProgress /> : <List>{eventItems}</List>}
+                {isLoading ? (
+                    <LinearProgress />
+                ) : (
+                    <List>
+                        <BlancItem
+                            sx={{ justifyContent: "center" }}
+                            onClick={() => navigate("/new")}
+                        >
+                            <Typography>Add new</Typography>
+                            <AddIcon />
+                        </BlancItem>
+                        {eventItems}
+                    </List>
+                )}
             </Box>
         </>
     )

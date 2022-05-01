@@ -4,6 +4,7 @@ import Cookies from "js-cookie"
 import Home from "./pages/Home"
 import Event from "./pages/Event"
 import Login from "./pages/Login"
+import CreateEvent from "./pages/CreateEvent"
 
 function App() {
     const navigate = useNavigate()
@@ -13,7 +14,6 @@ function App() {
         if (Cookies.get("logged_in") !== "yes") {
             navigate("/login")
         }
-
         setValidated(true)
     }, [])
 
@@ -26,6 +26,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/event/:eventId" element={<Event />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/new" element={<CreateEvent />} />
         </Routes>
     )
 }

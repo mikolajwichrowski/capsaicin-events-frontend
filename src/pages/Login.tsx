@@ -4,6 +4,8 @@ import {
     TextField,
     ToggleButton,
     ToggleButtonGroup,
+    Box,
+    Typography,
 } from "@mui/material"
 import { useFormik } from "formik"
 import { useQuery } from "react-query"
@@ -23,6 +25,7 @@ const Login = () => {
     const [authenticationOrLogin, setAuthenticationOrLogin] =
         useState<string>("authenticate")
     const [userData, setUserData] = useState<object | null>(null)
+    const [isHttpError, setIsHttpError] = useState<boolean>(false)
 
     const formik = useFormik({
         initialValues: {
@@ -33,7 +36,7 @@ const Login = () => {
         onSubmit: (values) => setUserData(values),
     })
 
-    const { isError, isLoading, data } = useQuery(
+    const { isError, isLoading } = useQuery(
         "userLogin",
         () =>
             fetch(`/api/${authenticationOrLogin}`, {
@@ -42,81 +45,123 @@ const Login = () => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-            }).then((res) => res.json()),
+            }).then((res) => {
+                if (res.status === 200) {
+                    return res.json()
+                } else {
+                    setIsHttpError(true)
+                }
+            }),
         {
             enabled: !!userData,
             retry: false,
             retryOnMount: true,
-            onError: (err) => {
-                console.error(err)
-                setUserData(null)
-            },
-            onSuccess: () => {
+            useErrorBoundary: true,
+            onSuccess: (data) => {
+                if (typeof data !== "object") {
+                    setIsHttpError(true)
+                    setUserData(null)
+                    return
+                }
                 navigate("/")
             },
         }
     )
 
     if (isLoading) {
-        return <div>Loading...</div>
+        return null
     }
 
     return (
-        <div>
-            <ToggleButtonGroup
-                color="primary"
-                exclusive
-                value={authenticationOrLogin}
-                onChange={(event, value: string) =>
-                    setAuthenticationOrLogin(value)
-                }
+        <Box
+            sx={{
+                padding: "10px",
+            }}
+        >
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    marginBottom: "50px",
+                }}
             >
-                <ToggleButton value="authenticate">Authenticate</ToggleButton>
-                <ToggleButton value="register">Register</ToggleButton>
-            </ToggleButtonGroup>
-            {isError && <div>Wrong username or password</div>}
+                <Typography variant="h4">Capcaisin Events</Typography>
+            </Box>
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                }}
+            >
+                <Box sx={{ flex: 1 }}></Box>
+                <Typography sx={{ color: "red", flex: 1 }}>
+                    {isError || (isHttpError && "Wrong username or password")}
+                </Typography>
+                <ToggleButtonGroup
+                    color="primary"
+                    exclusive
+                    value={authenticationOrLogin}
+                    onChange={(event, value: string) =>
+                        setAuthenticationOrLogin(value)
+                    }
+                >
+                    <ToggleButton value="authenticate">Login</ToggleButton>
+                    <ToggleButton value="register">Register</ToggleButton>
+                </ToggleButtonGroup>
+            </Box>
+
             <form onSubmit={formik.handleSubmit}>
-                <TextField
-                    fullWidth
-                    id="username"
-                    name="username"
-                    label="Username"
-                    value={formik.values.username}
-                    onChange={formik.handleChange}
-                    error={
-                        formik.touched.username &&
-                        Boolean(formik.errors.username)
-                    }
-                    helperText={
-                        formik.touched.username && formik.errors.username
-                    }
-                />
-                <TextField
-                    fullWidth
-                    id="password"
-                    name="password"
-                    label="Password"
-                    type="password"
-                    value={formik.values.password}
-                    onChange={formik.handleChange}
-                    error={
-                        formik.touched.password &&
-                        Boolean(formik.errors.password)
-                    }
-                    helperText={
-                        formik.touched.password && formik.errors.password
-                    }
-                />
+                <Box
+                    sx={{
+                        marginBottom: "10px",
+                        marginTop: "10px",
+                        "> div": { marginBottom: "10px" },
+                    }}
+                >
+                    <TextField
+                        fullWidth
+                        id="username"
+                        name="username"
+                        label="Username"
+                        value={formik.values.username}
+                        onChange={formik.handleChange}
+                        error={
+                            formik.touched.username &&
+                            Boolean(formik.errors.username)
+                        }
+                        helperText={
+                            formik.touched.username && formik.errors.username
+                        }
+                    />
+                    <TextField
+                        fullWidth
+                        id="password"
+                        name="password"
+                        label="Password"
+                        type="password"
+                        value={formik.values.password}
+                        onChange={formik.handleChange}
+                        error={
+                            formik.touched.password &&
+                            Boolean(formik.errors.password)
+                        }
+                        helperText={
+                            formik.touched.password && formik.errors.password
+                        }
+                    />
+                </Box>
                 <Button
                     color="primary"
                     variant="contained"
                     fullWidth
                     type="submit"
                 >
-                    Submit
+                    {authenticationOrLogin === "authenticate"
+                        ? "Login"
+                        : "Register"}
                 </Button>
             </form>
-        </div>
+        </Box>
     )
 }
 

@@ -9,6 +9,7 @@ export default defineConfig({
         target: 'http://localhost:5199',
         changeOrigin: true,
         secure: false,
+        cacheTimeout: 0
       }
     }
   }
