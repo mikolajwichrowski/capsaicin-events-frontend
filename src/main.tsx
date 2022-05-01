@@ -1,11 +1,22 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
-import './index.css'
-import App from './App'
+import React from "react"
+import ReactDOM from "react-dom"
+import { BrowserRouter } from "react-router-dom"
+import App from "./App"
+import { GlobalContext, defaultState } from "./store"
+import { QueryClient, QueryClientProvider } from "react-query"
+import "./global.css"
+
+const queryClient = new QueryClient()
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
+    <QueryClientProvider client={queryClient}>
+        <GlobalContext.Provider value={defaultState}>
+            <BrowserRouter>
+                <React.StrictMode>
+                    <App />
+                </React.StrictMode>
+            </BrowserRouter>
+        </GlobalContext.Provider>
+    </QueryClientProvider>,
+    document.getElementById("root")
 )
