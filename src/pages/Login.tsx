@@ -46,7 +46,7 @@ const Login = () => {
 					'Content-Type': 'application/json',
 				},
 			}).then((res) => {
-				if (res.status === 200) {
+				if (res.status === 200 || res.status === 201) {
 					return res.json()
 				} else {
 					setIsHttpError(true)

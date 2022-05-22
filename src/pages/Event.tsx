@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, FC, useRef } from 'react'
-import { Box, Chip, TextField } from '@mui/material'
+import { Box, Chip } from '@mui/material'
 import { useQuery, useQueryClient } from 'react-query'
 import { useNavigate } from 'react-router-dom'
 import { GlobalContext } from '../store'
@@ -22,7 +22,7 @@ import { AttendeesSection } from '../components/AttendeesSection'
 
 export interface ReactionType {
 	message: string
-	availibilityDate: Date
+	availibilityDate: Date | null
 	user: {
 		username: string
 	}
@@ -96,14 +96,21 @@ const Event: FC = () => {
 			message: '',
 			availibilityDate: null,
 		},
-		onSubmit: ({ message, availibilityDate }) => {
+		onSubmit: ({ message, availibilityDate }: Partial<ReactionType>) => {
 			const isComment = !!message
+
 			const payload = isComment
 				? {
 						message,
 				  }
 				: {
-						availibilityDate,
+						availibilityDate: new Date(
+							availibilityDate
+								? availibilityDate.setDate(
+										availibilityDate.getDate() + 1
+								  )
+								: new Date()
+						),
 				  }
 
 			console.log({ isComment, payload })
